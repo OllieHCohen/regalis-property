@@ -8,7 +8,7 @@
 
   <title>Regalis Property — Oxford</title>
 
-  <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,600,700" rel="stylesheet" />
 
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
@@ -19,51 +19,437 @@
   <meta name="theme-color" content="#ffffff" />
 
   <style>
+    :root {
+      --navy: #1f3a66;
+      --navy-soft: #4a5e80;
+      --gold: #e0a93b;
+      --green: #22c55e;
+      --bg: #f2f3f6;
+      --card: #ffffff;
+      --line: #e6e8ee;
+      --ink: #1d2330;
+      --muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
     }
 
-    body.holding {
-      background-repeat: repeat-x;
-      background-position: top;
-      background-color: #f2f3f6;
+    body {
+      background-color: var(--bg);
       font-family: 'Quicksand', Arial, sans-serif;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
     }
 
-    body.holding .logo {
+    /* ---- Hero ---- */
+    .hero {
+      text-align: center;
+      padding: 64px 20px 40px;
+    }
+
+    .hero .logo {
+      width: 200px;
+      height: 150px;
+      margin: 0 auto;
+      background-image: url('regalis-logo.svg');
       background-repeat: no-repeat;
       background-position: center top;
       background-size: 200px;
-      max-width: 435px;
-      height: 200px;
-      margin: 80px auto 0;
     }
 
-    body.holding .coming-soon {
+    .hero .oxford {
       font: 14px/19px Arial, sans-serif;
-      text-align: center;
-      margin: 40px auto 0;
       text-transform: uppercase;
       letter-spacing: 9px;
-      margin-left: 9px;
+      margin: 24px 0 0 9px;
+      color: var(--navy);
     }
 
-    body.holding .strapline {
-      font: 14px/19px Arial, sans-serif;
-      text-align: center;
-      margin: 20px auto 0;
+    .hero .strapline {
+      font: 14px/22px Arial, sans-serif;
       text-transform: uppercase;
-      letter-spacing: 9px;
-      margin-left: 9px;
+      letter-spacing: 6px;
+      margin: 14px auto 0;
+      max-width: 760px;
+      color: var(--muted);
+    }
+
+    /* ---- Listings ---- */
+    .listings {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 12px 20px 80px;
+    }
+
+    .listings-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 14px;
+      margin-bottom: 28px;
+    }
+
+    .listings-head h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .as-of { font-size: 12px; color: var(--muted); }
+
+    .status {
+      text-align: center;
+      color: var(--muted);
+      padding: 48px 0;
+      font-size: 15px;
+    }
+
+    /* Building block */
+    .building {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 40px;
+      box-shadow: 0 1px 2px rgba(20, 30, 60, 0.04);
+    }
+
+    .building-hero {
+      position: relative;
+      height: 240px;
+      background: #dfe3ec center/cover no-repeat;
+    }
+
+    .building-hero .gap-badge {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      background: rgba(31, 58, 102, 0.92);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 7px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.3px;
+    }
+
+    .building-body { padding: 22px 24px 8px; }
+
+    .building-body h3 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .building-meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 6px 0 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+    }
+
+    .bills-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #15803d;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+    .bills-badge::before { content: "✓"; font-weight: 700; }
+
+    /* Rooms grid */
+    .rooms {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      padding: 8px 0 24px;
+    }
+
+    .room {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+
+    .room-photo {
+      height: 170px;
+      background: #e9ecf3 center/cover no-repeat;
+    }
+
+    .room-info { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+    .room-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+
+    .room-specs { font-size: 13px; color: var(--muted); }
+
+    .price-row { display: flex; align-items: baseline; gap: 6px; }
+    .price { font-size: 20px; font-weight: 700; color: var(--navy); }
+    .price-unit { font-size: 13px; color: var(--muted); }
+
+    .dates-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .date-window {
+      font-size: 13.5px;
+      color: var(--ink);
+      background: #f4f6fa;
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-top: 4px;
+    }
+    .date-window .nights { color: var(--muted); font-size: 12px; }
+
+    .terms {
+      font-size: 11.5px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: auto;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 0 20px 48px;
+    }
+
+    @media (max-width: 560px) {
+      .hero { padding: 44px 16px 28px; }
+      .building-hero { height: 190px; }
     }
   </style>
 </head>
 
-<body class="holding">
-  <div class="logo" style="background-image: url('regalis-logo.svg')"></div>
-  <div class="strapline">Short Term Oxford Rooms to Rent for Summer 2026</div>
+<body>
+  <header class="hero">
+    <div class="logo"></div>
+    <div class="oxford">Oxford</div>
+    <div class="strapline">Short Term Oxford Rooms to Rent for Summer 2026</div>
+  </header>
+
+  <main class="listings">
+    <div class="listings-head">
+      <h2>Available Rooms</h2>
+      <div class="as-of" id="asOf"></div>
+    </div>
+    <div id="status" class="status">Loading available rooms…</div>
+    <div id="buildings"></div>
+  </main>
+
+  <footer>
+    Gas, electricity &amp; water included · Minimum stay 2 weeks · £100 one-off cleaning charge per stay
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://rmoqgbrttdbgxntbxaxr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtb3FnYnJ0dGRiZ3hudGJ4YXhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc0NzM1NjEsImV4cCI6MjA1MzA0OTU2MX0.Ps1dT9HtOBVzNbiUikzSCWsBhHfg1_2tTevUB7gaL2c';
+
+    const MIN_NIGHTS = 14;
+
+    async function sb(path) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+      });
+      if (!res.ok) throw new Error(`${path} → ${res.status}`);
+      return res.json();
+    }
+
+    const weeklyRent = (perMonth) => (Number(perMonth) * 12) / 52;
+    const fmtGBP = (n) => '£' + Math.round(n).toLocaleString('en-GB');
+
+    function fmtDate(iso) {
+      const d = new Date(iso + 'T00:00:00');
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function nightsBetween(a, b) {
+      return Math.round((new Date(b) - new Date(a)) / 86400000);
+    }
+
+    function heroImage(detail) {
+      const imgs = (detail && Array.isArray(detail.images)) ? detail.images : [];
+      const photos = imgs.filter(i => (i.type || '').toLowerCase() === 'photos');
+      const pick = (photos[0] || imgs[0]);
+      return pick ? pick.imageFile : null;
+    }
+
+    function roomCard(room, detail, windows) {
+      const name = room.room_location || (detail && detail.property_name) || 'Room';
+      const img = heroImage(detail);
+      const week = detail ? weeklyRent(detail.rent_per_month) : null;
+      const beds = detail ? detail.number_of_beds : null;
+      const baths = detail ? detail.number_of_bathrooms : null;
+
+      const specs = [];
+      if (beds != null) specs.push(beds + (beds === 1 ? ' bed' : ' beds'));
+      if (baths != null) specs.push(baths + (baths === 1 ? ' bath' : ' baths'));
+
+      const bookable = windows
+        .filter(w => nightsBetween(w.window_start, w.window_end) >= MIN_NIGHTS)
+        .sort((a, b) => a.window_start.localeCompare(b.window_start));
+
+      const datesHtml = bookable.length
+        ? bookable.map(w => {
+            const n = nightsBetween(w.window_start, w.window_end);
+            return `<div class="date-window">${fmtDate(w.window_start)} – ${fmtDate(w.window_end)} <span class="nights">· up to ${n} nights</span></div>`;
+          }).join('')
+        : `<div class="date-window" style="color:var(--muted)">No dates of 2+ weeks currently available</div>`;
+
+      const priceHtml = week
+        ? `<div class="price-row"><span class="price">${fmtGBP(week)}</span><span class="price-unit">/ week</span></div>`
+        : '';
+
+      return `
+        <article class="room">
+          <div class="room-photo" style="${img ? `background-image:url('${img}')` : ''}"></div>
+          <div class="room-info">
+            <div class="room-name">${name}</div>
+            ${specs.length ? `<div class="room-specs">${specs.join(' · ')}</div>` : ''}
+            ${priceHtml}
+            <div>
+              <div class="dates-label">Available</div>
+              ${datesHtml}
+            </div>
+            <div class="terms">
+              ${week ? `${fmtGBP(week)}/week + £100 one-off cleaning. ` : ''}Bills included · Min stay 2 weeks
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function buildingBlock(building, liveRooms, detailById, windowsByRoom) {
+      const bDetail = detailById.get(building.property_id);
+      const heroImg = heroImage(bDetail);
+
+      const weeks = liveRooms
+        .map(r => detailById.get(r.property_id))
+        .filter(Boolean)
+        .map(d => weeklyRent(d.rent_per_month));
+      const fromWeek = weeks.length ? Math.min(...weeks) : null;
+
+      const gap = (building.preceding_agreement_end && building.start_date)
+        ? `Summer gap: ${fmtDate(building.preceding_agreement_end)} – ${fmtDate(building.start_date)}`
+        : '';
+
+      const roomCount = liveRooms.length;
+      const roomsHtml = liveRooms
+        .sort((a, b) => a.property_id - b.property_id)
+        .map(r => roomCard(r, detailById.get(r.property_id), windowsByRoom.get(r.property_id) || []))
+        .join('');
+
+      const metaBits = [
+        building.city || 'Oxford',
+        `${roomCount} room${roomCount === 1 ? '' : 's'} available`,
+        fromWeek ? `from ${fmtGBP(fromWeek)}/week` : ''
+      ].filter(Boolean);
+
+      return `
+        <section class="building">
+          <div class="building-hero" style="${heroImg ? `background-image:url('${heroImg}')` : ''}">
+            ${gap ? `<span class="gap-badge">${gap}</span>` : ''}
+          </div>
+          <div class="building-body">
+            <h3>${building.property_address || (bDetail && bDetail.property_name) || 'Property'}</h3>
+            <div class="building-meta">${metaBits.map(m => `<span>${m}</span>`).join('')}</div>
+            <span class="bills-badge">Gas, electricity &amp; water included</span>
+            <div class="rooms">${roomsHtml}</div>
+          </div>
+        </section>`;
+    }
+
+    async function load() {
+      const statusEl = document.getElementById('status');
+      try {
+        // 1. Publish gate — strictly room/property-level is_live flags
+        const live = await sb('property_live_status?is_live=eq.true&select=property_id');
+        const liveIds = new Set(live.map(r => r.property_id));
+        if (liveIds.size === 0) { statusEl.textContent = 'No rooms are live yet. Please check back soon.'; return; }
+
+        // 2. Buildings + room membership
+        const [buildings, members] = await Promise.all([
+          sb('summer_void_properties?select=property_id,property_address,city,rooms,role,preceding_agreement_end,start_date'),
+          sb('summer_void_members?select=void_property_id,property_id,room_location')
+        ]);
+
+        // Live rooms grouped per building (strict: room's own property_id must be live)
+        const liveRoomsByBuilding = new Map();
+        for (const m of members) {
+          if (!liveIds.has(m.property_id)) continue;
+          if (!liveRoomsByBuilding.has(m.void_property_id)) liveRoomsByBuilding.set(m.void_property_id, []);
+          liveRoomsByBuilding.get(m.void_property_id).push(m);
+        }
+
+        // Keep only buildings with >=1 live room (parent) or whose own id is live (standalone)
+        const visibleBuildings = buildings.filter(b => {
+          const hasLiveRoom = (liveRoomsByBuilding.get(b.property_id) || []).length > 0;
+          const standaloneLive = b.role === 'standalone' && liveIds.has(b.property_id);
+          return hasLiveRoom || standaloneLive;
+        });
+
+        if (visibleBuildings.length === 0) { statusEl.textContent = 'No rooms are live yet. Please check back soon.'; return; }
+
+        // 3. Detail + availability for the live rooms (and the visible buildings, for hero images)
+        const liveRoomIds = [...new Set([].concat(...[...liveRoomsByBuilding.values()].map(rs => rs.map(r => r.property_id))))];
+        const detailIds = [...new Set([...liveRoomIds, ...visibleBuildings.map(b => b.property_id)])];
+        const inList = (ids) => `(${ids.join(',')})`;
+
+        const [detail, availability, syncLog] = await Promise.all([
+          sb(`bannits_property_cache?property_id=in.${inList(detailIds)}&select=property_id,property_name,rent_per_month,number_of_beds,number_of_bathrooms,images`),
+          sb(`room_availability?property_id=in.${inList(liveRoomIds)}&select=property_id,window_start,window_end`),
+          sb('summer_voids_sync_log?select=finished_at&order=finished_at.desc&limit=1').catch(() => [])
+        ]);
+
+        const detailById = new Map(detail.map(d => [d.property_id, d]));
+        const windowsByRoom = new Map();
+        for (const w of availability) {
+          if (!windowsByRoom.has(w.property_id)) windowsByRoom.set(w.property_id, []);
+          windowsByRoom.get(w.property_id).push(w);
+        }
+
+        // 4. Render
+        const html = visibleBuildings
+          .sort((a, b) => a.property_id - b.property_id)
+          .map(b => buildingBlock(b, liveRoomsByBuilding.get(b.property_id) || [], detailById, windowsByRoom))
+          .join('');
+        document.getElementById('buildings').innerHTML = html;
+        statusEl.style.display = 'none';
+
+        if (syncLog && syncLog[0]) {
+          document.getElementById('asOf').textContent =
+            'Availability as of ' + new Date(syncLog[0].finished_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+      } catch (err) {
+        statusEl.textContent = 'Sorry — we couldn’t load availability right now. Please try again shortly.';
+        console.error(err);
+      }
+    }
+
+    load();
+  </script>
 </body>
 
 </html>
