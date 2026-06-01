@@ -283,10 +283,21 @@
           // and never let it into the photo carousel.
           if (!hasTypedFloorplan) floorplans.push({ url, title: title || 'Floor plan' });
         } else {
-          photos.push({ url, title });
+          photos.push({ url, title, sort: i.sortOrder });
         }
       }
       return { photos, floorplans, videos };
+    }
+
+    const bySort = (a, b) => (a.sort == null ? 1e9 : a.sort) - (b.sort == null ? 1e9 : b.sort);
+
+    /* Order photos by sortOrder; if a hero override is set for this property_id,
+       force it to the front as the main thumbnail (works even with no cached photos). */
+    function applyHero(photos, override) {
+      const sorted = photos.slice().sort(bySort);
+      if (!override || !override.url) return sorted;
+      const rest = sorted.filter(p => p.url !== override.url);
+      return [{ url: override.url, title: override.title || '' }, ...rest];
     }
 
     function videoMeta(v) {
@@ -423,9 +434,11 @@
         </div>`;
     }
 
-    function roomCard(room, detail, windows) {
+    function roomCard(room, detail, windows, heroOverride) {
       const name = room.room_location || (detail && detail.property_name) || 'Room';
-      const { photos, floorplans, videos } = classifyImages(detail && detail.images);
+      const cls = classifyImages(detail && detail.images);
+      const floorplans = cls.floorplans, videos = cls.videos;
+      const photos = applyHero(cls.photos, heroOverride);
       const week = detail ? weeklyRent(detail.rent_per_month) : null;
       const beds = detail ? detail.number_of_beds : null;
       const baths = detail ? detail.number_of_bathrooms : null;
@@ -473,9 +486,11 @@
         </article>`;
     }
 
-    function buildingBlock(building, liveRooms, detailById, windowsByRoom) {
+    function buildingBlock(building, liveRooms, detailById, windowsByRoom, heroById) {
       const bDetail = detailById.get(building.property_id);
-      const { photos, floorplans, videos } = classifyImages(bDetail && bDetail.images);
+      const cls = classifyImages(bDetail && bDetail.images);
+      const floorplans = cls.floorplans, videos = cls.videos;
+      const photos = applyHero(cls.photos, heroById.get(building.property_id));
 
       const weeks = liveRooms.map(r => detailById.get(r.property_id)).filter(Boolean).map(d => weeklyRent(d.rent_per_month));
       const fromWeek = weeks.length ? Math.min(...weeks) : null;
@@ -484,7 +499,7 @@
 
       const roomCount = liveRooms.length;
       const roomsHtml = liveRooms.sort((a, b) => a.property_id - b.property_id)
-        .map(r => roomCard(r, detailById.get(r.property_id), windowsByRoom.get(r.property_id) || [])).join('');
+        .map(r => roomCard(r, detailById.get(r.property_id), windowsByRoom.get(r.property_id) || [], heroById.get(r.property_id))).join('');
 
       const metaBits = [
         building.city || 'Oxford',
@@ -525,8 +540,13 @@
     async function load() {
       const statusEl = document.getElementById('status');
       try {
-        const live = await sb('property_live_status?is_live=eq.true&select=property_id');
+        const live = await sb('property_live_status?is_live=eq.true&select=property_id,is_live,hero_image_url,hero_image_sort,hero_image_title');
         const liveIds = new Set(live.map(r => r.property_id));
+        // Optional per-property main-thumbnail override (falls back to first Photos image).
+        const heroById = new Map(
+          live.filter(r => r.hero_image_url)
+            .map(r => [r.property_id, { url: r.hero_image_url, title: r.hero_image_title || '', sort: r.hero_image_sort }])
+        );
         if (liveIds.size === 0) { statusEl.textContent = 'No rooms are live yet. Please check back soon.'; return; }
 
         const [buildings, members] = await Promise.all([
@@ -567,7 +587,7 @@
 
         document.getElementById('buildings').innerHTML = visibleBuildings
           .sort((a, b) => a.property_id - b.property_id)
-          .map(b => buildingBlock(b, liveRoomsByBuilding.get(b.property_id) || [], detailById, windowsByRoom))
+          .map(b => buildingBlock(b, liveRoomsByBuilding.get(b.property_id) || [], detailById, windowsByRoom, heroById))
           .join('');
         statusEl.style.display = 'none';
         wireCarousels();
