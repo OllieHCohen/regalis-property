@@ -140,8 +140,10 @@
 
     .building-body { padding: clamp(16px, 4vw, 24px); }
     .building-body h3 { margin: 0; font-size: clamp(18px, 4.5vw, 21px); font-weight: 700; color: var(--navy); }
-    .building-meta { color: var(--muted); font-size: 14px; margin: 6px 0 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+    .short-desc { color: #3a4252; font-size: 14.5px; line-height: 1.6; margin: 10px 0 0; max-width: 70ch; }
+    .building-meta { color: var(--muted); font-size: 14px; margin: 10px 0 14px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
 
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 2px; }
     .bills-badge {
       display: inline-flex; align-items: center; gap: 6px;
       background: rgba(34, 197, 94, 0.12); color: #15803d;
@@ -486,11 +488,17 @@
         </article>`;
     }
 
-    function buildingBlock(building, liveRooms, detailById, windowsByRoom, heroById) {
+    function buildingBlock(building, liveRooms, detailById, windowsByRoom, heroById, metaById) {
       const bDetail = detailById.get(building.property_id);
+      const bMeta = metaById.get(building.property_id) || {};
       const cls = classifyImages(bDetail && bDetail.images);
       const floorplans = cls.floorplans, videos = cls.videos;
       const photos = applyHero(cls.photos, heroById.get(building.property_id));
+
+      const shortDesc = bMeta.short_description || bMeta.sd || '';
+      const usps = [bMeta.usp1, bMeta.usp2, bMeta.usp3].map(u => (u || '').trim()).filter(Boolean);
+      const pills = ['Gas, electricity &amp; water included', 'Free Wifi', ...usps.map(esc)]
+        .map(label => `<span class="bills-badge">${label}</span>`).join('');
 
       const weeks = liveRooms.map(r => detailById.get(r.property_id)).filter(Boolean).map(d => weeklyRent(d.rent_per_month));
       const fromWeek = weeks.length ? Math.min(...weeks) : null;
@@ -512,8 +520,9 @@
           ${carousel(photos, floorplans, videos, gap)}
           <div class="building-body">
             <h3>${esc(building.property_address || (bDetail && bDetail.property_name) || 'Property')}</h3>
+            ${shortDesc ? `<p class="short-desc">${esc(shortDesc)}</p>` : ''}
             <div class="building-meta">${metaBits.map(m => `<span>${esc(m)}</span>`).join('')}</div>
-            <span class="bills-badge">Gas, electricity &amp; water included</span>
+            <div class="pills">${pills}</div>
             <div class="rooms">${roomsHtml}</div>
           </div>
         </section>`;
@@ -572,13 +581,16 @@
         const detailIds = [...new Set([...liveRoomIds, ...visibleBuildings.map(b => b.property_id)])];
         const inList = (ids) => `(${ids.join(',')})`;
 
-        const [detail, availability, syncLog] = await Promise.all([
+        const buildingIds = visibleBuildings.map(b => b.property_id);
+        const [detail, availability, buildingMeta, syncLog] = await Promise.all([
           sb(`bannits_property_cache?property_id=in.${inList(detailIds)}&select=property_id,property_name,rent_per_month,number_of_beds,number_of_bathrooms,images`),
           sb(`room_availability?property_id=in.${inList(liveRoomIds)}&select=property_id,window_start,window_end`),
+          sb(`bannits_property_cache?property_id=in.${inList(buildingIds)}&select=property_id,short_description,usp1:payload->>usp1,usp2:payload->>usp2,usp3:payload->>usp3,sd:payload->>shortDescription`),
           sb('summer_voids_sync_log?select=finished_at&order=finished_at.desc&limit=1').catch(() => [])
         ]);
 
         const detailById = new Map(detail.map(d => [d.property_id, d]));
+        const metaById = new Map(buildingMeta.map(m => [m.property_id, m]));
         const windowsByRoom = new Map();
         for (const w of availability) {
           if (!windowsByRoom.has(w.property_id)) windowsByRoom.set(w.property_id, []);
@@ -587,7 +599,7 @@
 
         document.getElementById('buildings').innerHTML = visibleBuildings
           .sort((a, b) => a.property_id - b.property_id)
-          .map(b => buildingBlock(b, liveRoomsByBuilding.get(b.property_id) || [], detailById, windowsByRoom, heroById))
+          .map(b => buildingBlock(b, liveRoomsByBuilding.get(b.property_id) || [], detailById, windowsByRoom, heroById, metaById))
           .join('');
         statusEl.style.display = 'none';
         wireCarousels();
