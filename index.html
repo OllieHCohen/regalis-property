@@ -182,6 +182,24 @@
     .extra-link svg { width: 13px; height: 13px; }
     .terms { font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: auto; line-height: 1.5; }
 
+    /* Location map */
+    .location { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .loc-title { font-size: 15px; font-weight: 700; color: var(--navy); margin: 0 0 12px; }
+    .map-link { display: block; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); line-height: 0; max-width: 600px; }
+    .map-img { width: 100%; height: auto; display: block; aspect-ratio: 2 / 1; object-fit: cover; background: #e9ecf3; }
+    .map-overlay {
+      position: absolute; right: 12px; bottom: 12px;
+      background: rgba(255,255,255,0.94); color: var(--navy);
+      font-size: 12.5px; font-weight: 600; padding: 7px 11px; border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: inline-flex; align-items: center; gap: 6px; line-height: 1;
+    }
+    .map-fallback {
+      display: none; align-items: center; justify-content: center; gap: 8px;
+      min-height: 150px; background: #eef1f7; color: var(--navy); font-weight: 600; font-size: 14px; line-height: 1.4;
+    }
+    .location.map-failed .map-img, .location.map-failed .map-overlay { display: none; }
+    .location.map-failed .map-fallback { display: flex; }
+
     footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 20px 48px; }
 
     /* ---- Lightbox ---- */
@@ -245,6 +263,10 @@
     const SUPABASE_URL = 'https://rmoqgbrttdbgxntbxaxr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtb3FnYnJ0dGRiZ3hudGJ4YXhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc0NzM1NjEsImV4cCI6MjA1MzA0OTU2MX0.Ps1dT9HtOBVzNbiUikzSCWsBhHfg1_2tTevUB7gaL2c';
     const MIN_NIGHTS = 14;
+    const MAP_PROXY = `${SUPABASE_URL}/functions/v1/static-map`; // server-side proxy keeps the Google key private
+
+    // If the static map fails (e.g. key not yet configured), show a clean fallback link instead of a broken image.
+    function mapError(img) { const loc = img.closest('.location'); if (loc) loc.classList.add('map-failed'); }
 
     /* SVG icons */
     const ICON_PLAN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h6V3M21 14h-6v7M9 14H3M15 3v6h6"/></svg>';
@@ -515,6 +537,18 @@
         fromWeek ? `from ${fmtGBP(fromWeek)}/week` : ''
       ].filter(Boolean);
 
+      const address = building.property_address || (bDetail && bDetail.property_name) || 'this property';
+      const lat = bMeta.lat, lng = bMeta.lng;
+      const locationHtml = (lat && lng) ? `
+        <div class="location">
+          <h4 class="loc-title">Location</h4>
+          <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat + ',' + lng)}" target="_blank" rel="noopener" aria-label="View ${esc(address)} on Google Maps">
+            <img class="map-img" src="${MAP_PROXY}?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&zoom=15&size=600x300" alt="Map of ${esc(address)}" loading="lazy" onerror="mapError(this)">
+            <span class="map-overlay">📍 View on map</span>
+            <span class="map-fallback">📍 View on Google Maps</span>
+          </a>
+        </div>` : '';
+
       return `
         <section class="building">
           ${carousel(photos, floorplans, videos, gap)}
@@ -524,6 +558,7 @@
             <div class="building-meta">${metaBits.map(m => `<span>${esc(m)}</span>`).join('')}</div>
             <div class="pills">${pills}</div>
             <div class="rooms">${roomsHtml}</div>
+            ${locationHtml}
           </div>
         </section>`;
     }
@@ -585,7 +620,7 @@
         const [detail, availability, buildingMeta, syncLog] = await Promise.all([
           sb(`bannits_property_cache?property_id=in.${inList(detailIds)}&select=property_id,property_name,rent_per_month,number_of_beds,number_of_bathrooms,images`),
           sb(`room_availability?property_id=in.${inList(liveRoomIds)}&select=property_id,window_start,window_end`),
-          sb(`bannits_property_cache?property_id=in.${inList(buildingIds)}&select=property_id,short_description,usp1:payload->>usp1,usp2:payload->>usp2,usp3:payload->>usp3,sd:payload->>shortDescription`),
+          sb(`bannits_property_cache?property_id=in.${inList(buildingIds)}&select=property_id,short_description,usp1:payload->>usp1,usp2:payload->>usp2,usp3:payload->>usp3,sd:payload->>shortDescription,lat:payload->>latitude,lng:payload->>longitude`),
           sb('summer_voids_sync_log?select=finished_at&order=finished_at.desc&limit=1').catch(() => [])
         ]);
 
