@@ -375,7 +375,7 @@
     function openVideo(meta) {
       if (meta.embeddable) {
         let inner = '';
-        if (meta.isFile) inner = `<div class="lb-video-wrap"><video src="${esc(meta.url)}" controls playsinline preload="metadata"></video><button class="lb-play" type="button" aria-label="Play video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></div>`;
+        if (meta.isFile) inner = `<div class="lb-video-wrap"><video src="${esc(meta.url)}" poster="${esc(meta.url.split('?')[0].replace(/\.(mp4|webm|mov|m4v|ogg)$/i, '.jpg'))}" controls playsinline preload="metadata"></video><button class="lb-play" type="button" aria-label="Play video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></div>`;
         else if (meta.yt) {
           const id = (meta.url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{6,})/) || [])[1];
           inner = `<iframe src="https://www.youtube.com/embed/${esc(id)}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
